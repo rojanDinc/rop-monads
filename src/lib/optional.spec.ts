@@ -1,5 +1,6 @@
 import test from 'ava';
 
+import { storeEvenNumber } from './mock';
 import { Optional } from './optional';
 
 // Test get() function
@@ -55,10 +56,6 @@ import { Optional } from './optional';
     t.is(actual, expected);
   });
 });
-
-function storeEvenNumber(n: number): Optional<number> {
-  return n % 2 === 0 ? Optional.some(n) : Optional.none();
-}
 
 // Test flatMap() function
 [
