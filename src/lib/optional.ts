@@ -1,4 +1,4 @@
-export type None = null;
+type None = null;
 
 export class Optional<T> {
   private readonly value: T | None;
