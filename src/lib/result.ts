@@ -12,9 +12,9 @@ export class Result<T, F> {
   private constructor(private readonly wrapped: Ok<T> | Failure<F>) {}
 
   /**
-   * This method creates an `Result` from an "ok" value.
+   * Create an `Result` from an "ok" value.
    * @param value
-   * @returns `Result` object
+   * @returns
    */
   public static ok<T, F>(value: T): Result<T, F> {
     return new Result({
@@ -24,9 +24,9 @@ export class Result<T, F> {
   }
 
   /**
-   * This method creates an `Result` from an `Error` value.
-   * @param err Must be an `Error` or a child object of `Error`
-   * @returns `Result` object
+   * Create an `Result` from a failure value.
+   * @param err
+   * @returns
    */
   public static err<T, F>(failure: F): Result<T, F> {
     return new Result({
@@ -39,11 +39,11 @@ export class Result<T, F> {
    * Transform a function to `Result`.
    * ```typescript
    * Result.of(() => {
-   *  return myFunction();
+   *  return throwableFn();
    * });
    * ```
-   * @param throwableFn Throwable function which can throw or give an value
-   * @returns `Result` object
+   * @param throwableFn Throwable function which can throw or return an value
+   * @returns
    */
   public static of<T, F>(throwableFn: () => T | never): Result<T, F> {
     try {
@@ -62,9 +62,7 @@ export class Result<T, F> {
    *  // handle Failure
    * }
    * ```
-   * @typeParam `T`
-   * @typeParam `F`
-   * @throws `F` if it is an instance of `Error`
+   * @throws `F`
    * @returns the wrapped value
    */
   public get(): T {
@@ -77,10 +75,10 @@ export class Result<T, F> {
   }
 
   /**
-   * Transform the wrapped `Result` value to a new value.
+   * Transform the wrapped "ok" value to a new value.
    * @typeParam `U` the type of the new transformed value
-   * @param fn Function transforming the wrapped value to a new one
-   * @returns A new `Result` with a new wrapped value
+   * @param fn Transforming the wrapped value
+   * @returns
    */
   public map<U>(fn: (wrapped: T) => U): Result<U, F> {
     switch (this.wrapped.kind) {
@@ -92,10 +90,10 @@ export class Result<T, F> {
   }
 
   /**
-   * Transform the wrapped `Result` error to a new error.
-   * @typeParam `E` should be of type `Error`
-   * @param fn Function transforming the wrapped error to a new one
-   * @returns A new `Result` with a new wrapped error
+   * Transform the wrapped "err" to a new error.
+   * @typeParam `E`
+   * @param fn Transforming the wrapped error
+   * @returns
    */
   public mapError<E>(fn: (wrapped: F) => E): Result<T, E> {
     switch (this.wrapped.kind) {
@@ -107,9 +105,9 @@ export class Result<T, F> {
   }
 
   /**
-   * Transform `Result<T, Failure>` success type to a new one e.g. `Result<U, F>`.
-   * @typeParam
-   * @param fn
+   * Transform the current `Result<T, F>` to a new `Result<U, F>`.
+   * @typeParam `U`
+   * @param fn Transforming the wrapped value to a new `Result`
    * @returns
    */
   public flatMap<U>(fn: (wrapped: T) => Result<U, F>): Result<U, F> {
@@ -121,6 +119,12 @@ export class Result<T, F> {
     }
   }
 
+  /**
+   * Transform the current `Result<T, F>` to a new `Result<T, E>`.
+   * @typeParam `E`
+   * @param fn Transforming the wrapped value to a new `Result`
+   * @returns
+   */
   public flatMapError<E>(fn: (wrapped: F) => Result<T, E>): Result<T, E> {
     switch (this.wrapped.kind) {
       case 'OK':
@@ -130,16 +134,31 @@ export class Result<T, F> {
     }
   }
 
+  /**
+   * Apply the provided callback function for successful result.
+   * @param fn Callback function
+   * @returns
+   */
   public apply(fn: (wrapped: T) => void): Result<T, F> {
     if (this.wrapped.kind === 'OK') fn(this.wrapped.value);
     return this;
   }
 
+  /**
+   * Apply the provided callback function for unsuccessful result.
+   * @param fn Callback function
+   * @returns
+   */
   public applyError(fn: (wrapped: F) => void): Result<T, F> {
     if (this.wrapped.kind === 'FAILURE') fn(this.wrapped.failure);
     return this;
   }
 
+  /**
+   * Pattern match on successful case or failure case.
+   * @param cases Object containing callback function for when result is ok or err
+   * @returns
+   */
   public match(cases: {
     ok: (value: T) => void;
     err: (failure: F) => void;
