@@ -1,161 +1,126 @@
 import test from 'ava';
 
-import { storeEvenNumber } from './mock';
 import { Optional } from './optional';
 
-// Test get() function
-[
-  {
-    value: 5,
-    expected: 5,
-  },
-  {
-    value: 'Eiffel tower',
-    expected: 'Eiffel tower',
-  },
-  {
-    value: undefined,
-    expected: null,
-  },
-  {
-    value: null,
-    expected: null,
-  },
-].forEach(({ value, expected }) => {
-  test(`get() - value: ${value}, expected: ${expected}`, (t) => {
-    const actual = Optional.of(value).get();
-    t.is(actual, expected);
-  });
+test('create an Optional with some string value', t => {
+  // Arrange
+  const expected = 'John';
+  // Act
+  const actual = Optional.some('John').get();
+  // Assert
+  t.is(actual, expected);
 });
 
-// Test map() function
-[
-  {
-    value: 5,
-    fn: (v: number) => v ** 2,
-    expected: 25,
-  },
-  {
-    value: 423,
-    fn: (v: number) => String(v),
-    expected: '423',
-  },
-  {
-    value: {
-      name: 'John Doe',
-      age: 42,
-    },
-    fn: (v: { name: string; age: number }) => v.age,
-    expected: 42,
-  },
-].forEach(({ value, fn, expected }) => {
-  test(`map(${fn}) - value: ${value}, expected: ${expected}`, (t) => {
-    const actual = Optional.of(value)
-      .map(fn as never)
-      .get();
-    t.is(actual, expected);
-  });
+test('create an Optional with none value', t => {
+  // Arrange
+  const expected = null;
+  // Act
+  const actual = Optional.none().get();
+  // Assert
+  t.is(actual, expected);
 });
 
-// Test flatMap() function
-[
-  {
-    value: 2,
-    fn: (v: number) => storeEvenNumber(v),
-    expected: 2,
-  },
-  {
-    value: 45,
-    fn: (v: number) => storeEvenNumber(v),
-    expected: null,
-  },
-  {
-    value: 'Stockholm',
-    fn: (v: string) => Optional.of(v),
-    expected: 'Stockholm',
-  },
-  {
-    value: 'Oslo',
-    fn: (v: string) => Optional.some(v),
-    expected: 'Oslo',
-  },
-].forEach(({ value, fn, expected }) => {
-  test(`flatMap(${fn}) - value: ${value}, expected: ${expected}`, (t) => {
-    const actual = Optional.of(value)
-      .flatMap(fn as never)
-      .get();
-    t.is(actual, expected);
-  });
+test('create an Optional from a value that is not nullable', t => {
+  // Arrange
+  const expected = 245;
+  // Act
+  const actual = Optional.of(245).get();
+  // Assert
+  t.is(actual, expected);
 });
 
-// Test apply() function
-[
-  {
-    value: 4924,
-    expected: 4924,
-  },
-  {
-    value: 'Berlin',
-    expected: 'Berlin',
-  },
-  {
-    value: false,
-    expected: false,
-  },
-].forEach(({ value, expected }) => {
-  test(`apply() - value: ${value}, expected: ${expected}`, (t) => {
-    Optional.of(value).apply((actual) => t.is(actual, expected));
-  });
+test('create an Optional from a value that is nullable', t => {
+  // Arrange
+  const expected = null;
+  // Act
+  const actual = Optional.of(null).get();
+  // Assert
+  t.is(actual, expected);
 });
 
-// Test filter() function
-[
-  {
-    value: 5,
-    fn: (v: number) => v % 2 === 0,
-    expected: null,
-  },
-  {
-    value: 'John Doe',
-    fn: (v: string) => v.includes('Doe'),
-    expected: 'John Doe',
-  },
-  {
-    value: 'Bob Lane',
-    fn: (v: string) => v.toLowerCase().includes('doe'),
-    expected: null,
-  },
-].forEach(({ value, fn, expected }) => {
-  test(`filter(${fn}) - value: ${value}, expected: ${expected}`, (t) => {
-    const actual = Optional.of(value)
-      .filter(fn as never)
-      .get();
-    t.is(actual, expected);
-  });
+test('transform an Optionals wrapped value type', t => {
+  // Arrange
+  const expected = 2341;
+  // Act
+  const actual = Optional.of('2341').map(Number).get();
+  // Assert
+  t.is(actual, expected);
 });
 
-// Test apply().get()
-[
-  {
-    value: 'Bob Lane',
-    fn: (v: string) => v.toLowerCase().includes('doe'),
-    expected: 'Bob Lane',
-  },
-  {
-    value: null,
-    fn: (v: string) => v.toLowerCase().includes('doe'),
-    expected: null,
-  },
-  {
-    value: 423,
-    fn: (v: number) => v + 7,
-    expected: 423,
-  },
-].forEach(({ value, fn, expected }) => {
-  test(`apply(${fn}).get() - value: ${value}, expected: ${expected}`, (t) => {
-    const actual = Optional.of(value)
-      .apply(fn as never)
-      .get();
-    t.is(actual, expected);
-  });
+test('map function should not run if wrapped value is none', t => {
+  // Arrange
+  // Act
+  // Assert
+  Optional.none().map(() =>
+    t.fail('map should not run if wrapped value is none')
+  );
+  t.pass();
+});
+
+test('flatten a nested optional', t => {
+  // Arrange
+  const expected = 23;
+  // Act
+  const actual = Optional.of(Optional.some(23))
+    .flatMap(opt => opt)
+    .get();
+  // Assert
+  t.is(actual, expected);
+});
+
+test('apply given callback', t => {
+  // Arrange
+  const expected = 23;
+  // Act
+  // Assert
+  Optional.some(23).apply(actual => t.is(actual, expected));
+});
+
+test('applied function should not run when Optional is none', t => {
+  // Arrange
+  // Act
+  // Assert
+  Optional.none().apply(() =>
+    t.fail('apply should not run is wrapped value is none')
+  );
+  t.pass();
+});
+
+test('filter should make optional none', t => {
+  // Arrange
+  const expected = null;
+  // Act
+  const actual = Optional.some(10)
+    .filter(wrapped => wrapped > 20)
+    .get();
+  // Assert
+  t.is(actual, expected);
+});
+
+test('getOrElse should return a value when Optional is none', t => {
+  // Arrange
+  const expected = 45;
+  // Act
+  const actual = Optional.none().getOrElse(() => 45);
+  // Assert
+  t.is(actual, expected);
+});
+
+test('getOrElse should return the wrapped some value', t => {
+  // Arrange
+  const expected = 34;
+  // Act
+  const actual = Optional.some(34).getOrElse(() => 45);
+  // Assert
+  t.is(actual, expected);
+});
+
+test('hasValue should return true if Optional is some value', t => {
+  // Arrange, Act, Assert
+  t.is(Optional.some(4).hasValue, true);
+});
+
+test('hasValue should return false if Optional is none', t => {
+  // Arrange, Act, Assert
+  t.is(Optional.none().hasValue, false);
 });

@@ -97,7 +97,7 @@ export class Optional<T> {
    * @param fn Callback function.
    * @returns Same instance.
    */
-  public orElse(fn: () => NonNullable<T>): T {
+  public getOrElse(fn: () => NonNullable<T>): T {
     if (this.isNone()) {
       return fn();
     }
