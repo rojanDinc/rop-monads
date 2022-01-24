@@ -1,13 +1,13 @@
 {
-  "name": "another-monad-lib",
+  "name": "rop-monads",
   "version": "1.0.0",
-  "description": "Option and Result monads",
+  "description": "Provides Result and Optional monads, inspired by railway oriented programming.",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
   "module": "build/module/index.js",
-  "repository": "https://github.com/rojanDinc/another-monad-lib",
+  "repository": "https://github.com/rojanDinc/rop-monads",
   "license": "MIT",
-  "keywords": [],
+  "keywords": ["result", "rop", "railway oriented programming", "optional", "monad", "monads", "monadic", "fp", "functional programming", "typescript", "ok", "some", "none", "error"],
   "scripts": {
     "build": "run-p build:*",
     "build:main": "tsc -p tsconfig.json",

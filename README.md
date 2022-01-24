@@ -1,3 +1,3 @@
-# another-monad
+# rop-monads
 
 Option and Result monads
