@@ -1,10 +1,7 @@
 type None = null;
 
 export class Optional<T> {
-  private readonly value: T | None;
-  private constructor(value: T | None) {
-    this.value = value;
-  }
+  private constructor(private readonly value: T | None) {}
 
   public static none<T>(): Optional<T> {
     return new Optional<T>(null);
