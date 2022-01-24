@@ -1,10 +1,6 @@
 import { Optional } from './optional';
 import { Result } from './result';
 
-export function storeEvenNumber(n: number): Optional<number> {
-  return n % 2 === 0 ? Optional.some(n) : Optional.none();
-}
-
 export function divide(x: number, y: number): number {
   if (y === 0) throw 'cannot divide with zero';
   return x / y;
@@ -14,16 +10,6 @@ export function divideResult(x: number, y: number): Result<number, string> {
   if (y === 0) return Result.err('y cannot be zero');
 
   return Result.ok(x / y);
-}
-
-export async function asyncCalculation(
-  n: number
-): Promise<Result<number, string>> {
-  return new Promise((res, rej) => {
-    if (n === 0) rej(Result.err('n cannot be zero'));
-
-    res(Result.ok(n * 10));
-  });
 }
 
 export class Person {
