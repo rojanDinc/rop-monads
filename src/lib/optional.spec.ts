@@ -1,4 +1,5 @@
 import test from 'ava';
+import { Person, PersonError } from './mock';
 
 import { Optional } from './optional';
 
@@ -68,6 +69,16 @@ test('flatten a nested optional', t => {
   t.is(actual, expected);
 });
 
+test('flatMap should not run callback when wrapped value is none', t => {
+  // Arrange
+  const expected = null;
+  // Act
+  const actual = Optional.none().flatMap(() => Optional.some(1)).get()
+  t.log(`actual: ${actual}`);
+  // Assert
+  t.is(actual, expected);
+});
+
 test('apply given callback', t => {
   // Arrange
   const expected = 23;
@@ -92,6 +103,17 @@ test('filter should make optional none', t => {
   // Act
   const actual = Optional.some(10)
     .filter(wrapped => wrapped > 20)
+    .get();
+  // Assert
+  t.is(actual, expected);
+});
+
+test('filter should not run if none', t => {
+  // Arrange
+  const expected = null;
+  // Act
+  const actual = Optional.none()
+    .filter(() => true)
     .get();
   // Assert
   t.is(actual, expected);
@@ -123,4 +145,27 @@ test('hasValue should return true if Optional is some value', t => {
 test('hasValue should return false if Optional is none', t => {
   // Arrange, Act, Assert
   t.is(Optional.none().hasValue, false);
+});
+
+test('fail when validating an negative number Person age', t => {
+  // Arrange
+  const expected: PersonError = {
+    kind: "PERSON_AGE_INVALID",
+    reason: new RangeError('person age cannot be a negative number')
+  };
+  const person: Person = new Person("John", -1);
+  // Act
+  const actual = person.validate().get();
+  // Assert
+  t.deepEqual(actual, expected);
+});
+
+test('return none when Person validation is correct', t => {
+  // Arrange
+  const expected = null;
+  const person: Person = new Person("John", 32);
+  // Act
+  const actual = person.validate().get();
+  // Assert
+  t.is(actual, expected);
 });
