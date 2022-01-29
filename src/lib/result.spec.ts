@@ -36,6 +36,18 @@ test('transforming Person instance into result', t => {
   t.deepEqual(actual, expected);
 });
 
+test('get() should throw if Result is of failure type', t => {
+  // Arrange
+  const expected = 'some failure';
+  // Act
+  try {
+    Result.err('some failure').get();
+    t.fail('should throw error when calling get() on Result of failure type');
+  } catch (actual) {
+    t.is(actual, expected);
+  }
+});
+
 test('transforming failure of type string into result', t => {
   // Arrange
   const expected = 'this is an failure of type string';
@@ -181,12 +193,47 @@ test('transform result ok value to new ok value', t => {
     });
 });
 
+test('flatMap callback should not run if wrapped value is of failure', t => {
+  // Arrange
+  const expected = 'some failure';
+  // Act
+  Result.err('some failure')
+    .flatMap(() => Result.ok(2))
+    // Assert
+    .match({
+      ok: () => t.fail('should not match ok case'),
+      err: actual => t.is(actual, expected),
+    });
+});
+
 test('transform failing result to a new successful result', t => {
   // Arrange
   const expected = 4;
   // Act
   Result.of(() => divide(4, 0))
     .flatMapError(() => divideResult(4, 1))
+    // Assert
+    .match({
+      ok: actual => t.is(actual, expected),
+      err: () => t.fail('should not match err case'),
+    });
+});
+
+test('flatMap a function that returns a new result', t => {
+  Result.ok(20)
+    .flatMap(n => divideResult(n, 0))
+    .match({
+      ok: () => t.fail('should not match ok case'),
+      err: actual => t.is(actual, 'y cannot be zero'),
+    });
+});
+
+test('flatMapError transforming callback should not run when wrapped value is ok', t => {
+  // Arrange
+  const expected = 2;
+  // Act
+  Result.ok(2)
+    .flatMapError(() => Result.err('some failure'))
     // Assert
     .match({
       ok: actual => t.is(actual, expected),
