@@ -1,6 +1,6 @@
 import test from 'ava';
-import { Person, PersonError } from './mock';
 
+import { Person, PersonError } from './mock';
 import { Optional } from './optional';
 
 test('create an Optional with some string value', t => {
@@ -73,7 +73,9 @@ test('flatMap should not run callback when wrapped value is none', t => {
   // Arrange
   const expected = null;
   // Act
-  const actual = Optional.none().flatMap(() => Optional.some(1)).get()
+  const actual = Optional.none()
+    .flatMap(() => Optional.some(1))
+    .get();
   t.log(`actual: ${actual}`);
   // Assert
   t.is(actual, expected);
@@ -150,10 +152,10 @@ test('hasValue should return false if Optional is none', t => {
 test('fail when validating an negative number Person age', t => {
   // Arrange
   const expected: PersonError = {
-    kind: "PERSON_AGE_INVALID",
-    reason: new RangeError('person age cannot be a negative number')
+    kind: 'PERSON_AGE_INVALID',
+    reason: new RangeError('person age cannot be a negative number'),
   };
-  const person: Person = new Person("John", -1);
+  const person: Person = new Person('John', -1);
   // Act
   const actual = person.validate().get();
   // Assert
@@ -163,7 +165,7 @@ test('fail when validating an negative number Person age', t => {
 test('return none when Person validation is correct', t => {
   // Arrange
   const expected = null;
-  const person: Person = new Person("John", 32);
+  const person: Person = new Person('John', 32);
   // Act
   const actual = person.validate().get();
   // Assert
