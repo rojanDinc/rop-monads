@@ -67,7 +67,87 @@
 				<a href="#rop-monads" id="rop-monads" style="color: inherit; text-decoration: none;">
 					<h1>rop-monads</h1>
 				</a>
-				<p>Option and Result monads</p>
+				<a href="#getting-started" id="getting-started" style="color: inherit; text-decoration: none;">
+					<h2>Getting started</h2>
+				</a>
+				<pre><code>npm <span class="hljs-keyword">install </span>rop-monads
+
+<span class="hljs-keyword">or
+</span>
+yarn <span class="hljs-keyword">add </span>rop-monads
+</code></pre>
+				<a href="#using-rop-monads" id="using-rop-monads" style="color: inherit; text-decoration: none;">
+					<h2>Using rop-monads</h2>
+				</a>
+				<a href="#optional" id="optional" style="color: inherit; text-decoration: none;">
+					<h4>Optional</h4>
+				</a>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { Optional } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;rop-monads&#x27;</span>;
+
+<span class="hljs-keyword">const</span> age: Optional&lt;<span class="hljs-built_in">number</span>&gt; = Optional.of(getPerson()) <span class="hljs-comment">// getPerson() returns an optional object that contains an age</span>
+  .map(<span class="hljs-function"><span class="hljs-params">person</span> =&gt;</span> person.age);
+</code></pre>
+				<a href="#result" id="result" style="color: inherit; text-decoration: none;">
+					<h4>Result</h4>
+				</a>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { Result } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;rop-monads&#x27;</span>;
+
+<span class="hljs-keyword">const</span> todos: Result&lt;Todo[], CustomError&gt; = apiCall()<span class="hljs-comment">// returns a result</span>
+  .flatMap(<span class="hljs-function"><span class="hljs-params">json</span> =&gt;</span> transformJson(json)) <span class="hljs-comment">// the transform function can return a result as the json decoding can fail</span>
+
+todos.match({
+  <span class="hljs-attr">ok</span>: <span class="hljs-function"><span class="hljs-params">todos</span> =&gt;</span> handleTodos(todos),
+  <span class="hljs-attr">err</span>: <span class="hljs-function"><span class="hljs-params">failure</span> =&gt;</span> handleFailure(failure)
+});
+</code></pre>
+				<p>Using <code>Result</code> in HTTP controllers for example with <code>express.js</code></p>
+				<p>Error.ts</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">type</span> NotFoundError = {
+  <span class="hljs-attr">kind</span>: <span class="hljs-string">&quot;NOT_FOUND&quot;</span>;
+  reason: <span class="hljs-built_in">string</span>;
+};
+
+<span class="hljs-keyword">type</span> <span class="hljs-built_in">InternalError</span> = {
+  <span class="hljs-attr">kind</span>: <span class="hljs-string">&quot;INTERNAL&quot;</span>;
+  reason: <span class="hljs-built_in">Error</span>;
+};
+
+<span class="hljs-keyword">type</span> PersonError = NotFoundError | <span class="hljs-built_in">InternalError</span>
+</code></pre>
+				<p>PersonController.ts</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> personService = getPersonService();
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">httpHandleFailure</span>(<span class="hljs-params">res: express.Response, failure: PersonError</span>) </span>{
+  <span class="hljs-keyword">switch</span> (failure.kind) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;NOT_FOUND&quot;</span>:
+      log(<span class="hljs-string">&quot;failed to find person it does not exist&quot;</span>, failure.reason);
+      <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">404</span>).send({ <span class="hljs-attr">status</span>: <span class="hljs-number">404</span>, <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;person does not exist&quot;</span> });
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;INTERNAL&quot;</span>:
+      log(<span class="hljs-string">&quot;failed to find person&quot;</span>, failure.reason.message);
+      <span class="hljs-keyword">return</span> res.status(<span class="hljs-number">500</span>).send({ <span class="hljs-attr">status</span>: <span class="hljs-number">500</span>, <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;something went wrong&quot;</span> });
+  }
+}
+
+<span class="hljs-comment">// assumed that all functions used are not async</span>
+app.get(<span class="hljs-string">&#x27;/person/:id&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+  getIdFromParams(req) <span class="hljs-comment">// returns a Result</span>
+  .flatMap(<span class="hljs-function"><span class="hljs-params">id</span> =&gt;</span> personService.findPerson(id))
+  .map(<span class="hljs-function"><span class="hljs-params">person</span> =&gt;</span> encodePerson(person))
+  .match({
+    <span class="hljs-attr">ok</span>: <span class="hljs-function"><span class="hljs-params">personJson</span> =&gt;</span> res.status(<span class="hljs-number">200</span>).send(personJson),
+    <span class="hljs-attr">err</span>: <span class="hljs-function"><span class="hljs-params">failure</span> =&gt;</span> httpHandleFailure(res, failure)
+  });
+});
+</code></pre>
+				<p>For more on how to use this library checkout our <a href="https://rojandinc.github.io/rop-monads">API documentation</a>.</p>
+				<a href="#contribute" id="contribute" style="color: inherit; text-decoration: none;">
+					<h2>Contribute</h2>
+				</a>
+				<p>We welcome pull requests. Learn how to <a href="https://github.com/rojanDinc/rop-monads/blob/master/.github/CONTRIBUTING.md">contribute</a>.</p>
+				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+					<h2>License</h2>
+				</a>
+				<p>rop-monads is <a href="https://github.com/rojanDinc/rop-monads/blob/master/LICENSE">MIT licensed</a>.</p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
