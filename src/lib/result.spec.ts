@@ -241,22 +241,24 @@ test('flatMapError transforming callback should not run when wrapped value is ok
     });
 });
 
-test('apply function wrapped value', t => {
+test('should run apply when wrapped is a success', t => {
   // Arrange
   const expected = 'Madrid';
   // Act
   Result.ok('Madrid')
     // prettier-ignore
     // Assert
-    .apply(actual => t.is(actual, expected));
+    .apply(actual => t.is(actual, expected))
+    .applyError(() => t.fail('should not run applyError callback'));
 });
 
-test('apply error function wrapped failure', t => {
+test('should run applyError callback when wrapped is a failure', t => {
   // Arrange
   const expected = 'some string failure';
   // Act
   Result.err('some string failure')
     //prettier-ignore
     // Assert
+    .apply(() => t.fail('should not run apply callback'))
     .applyError(actual => t.is(actual, expected));
 });

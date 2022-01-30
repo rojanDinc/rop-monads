@@ -110,6 +110,17 @@ test('filter should make optional none', t => {
   t.is(actual, expected);
 });
 
+test('filter should pass', t => {
+  // Arrange
+  const expected = 10;
+  // Act
+  const actual = Optional.some(10)
+    .filter(wrapped => wrapped < 20)
+    .get();
+  // Assert
+  t.is(actual, expected);
+});
+
 test('filter should not run if none', t => {
   // Arrange
   const expected = null;
