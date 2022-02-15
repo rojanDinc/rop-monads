@@ -8,10 +8,9 @@ cache:
   directories:
   - node_modules
 install:
-- yarn
+  - yarn
 script:
-- yarn test
-- yarn cov:send
+  - yarn test
 deploy:
   provider: npm
   email: rojand94@gmail.com
@@ -22,3 +21,6 @@ deploy:
     branch: master
     repo: rojanDinc/rop-monads
   skip_cleanup: 'true'
+after_success:
+  - yarn cov:lcov
+  - bash <(curl -s https://codecov.io/bash)
