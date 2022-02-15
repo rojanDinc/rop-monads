@@ -1,5 +1,6 @@
 # rop-monads
-
+[![Build Status](https://app.travis-ci.com/rojanDinc/rop-monads.svg?branch=master)](https://app.travis-ci.com/rojanDinc/rop-monads)
+[![codecov](https://codecov.io/gh/rojanDinc/rop-monads/branch/master/graph/badge.svg?token=M431CWJG35)](https://codecov.io/gh/rojanDinc/rop-monads)
 ## Getting started
 ```
 npm install rop-monads
