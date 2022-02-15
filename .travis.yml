@@ -11,7 +11,7 @@ install:
 - yarn
 script:
 - yarn test
-- yarn cov
+- yarn cov:send
 deploy:
   provider: npm
   email: rojand94@gmail.com
