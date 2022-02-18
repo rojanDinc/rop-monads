@@ -38,6 +38,9 @@ Using `Result` in HTTP controllers for example with `express.js`
 
 Error.ts
 ```typescript
+// Discriminated unions which is a recommended way to create failure types
+// to be used with this library
+
 type NotFoundError = {
   kind: "NOT_FOUND";
   reason: string;
